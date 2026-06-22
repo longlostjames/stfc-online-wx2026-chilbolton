@@ -35,7 +35,7 @@ from dash import Input, Output, Patch, State, callback, dcc, html
 # (_vX.Y in the filename) is preferred; newest mtime breaks ties.
 # ---------------------------------------------------------------------------
 # All wx2026 data live under this root on the SSDE GWS.
-WX2026_ROOT = "/gws/ssde/j25a/chil_atmos/wx2026"
+WX2026_ROOT = "/data/wexp/cwalden/wx2026"
 
 # cfarr met-sensors (2001–2015, old cfarr format — pressure/temperature/rh/wind)
 # yearly layout for 2001–2014; monthly_mm layout for 2015.
@@ -50,16 +50,16 @@ PRESSURE_ROOTS = [
         "PRESSURE_DATA_ROOT",
         os.path.join(WX2026_ROOT, "pressure"),
     ), "yearly", "20190101"),
-    # wx2026 met-sensors 2015 (monthly_mm — month subdirs 01–12 are the only layout here)
-    (MET_SENSORS_ROOT, "monthly_mm", "20150101", "20151231"),
+    # wx2026 met-sensors 2015 (yearly — files directly in year dir)
+    (MET_SENSORS_ROOT, "yearly", "20150101", "20151231"),
     # wx2026 met-sensors 2001–2014 (yearly — files directly in year dir)
     (MET_SENSORS_ROOT, "yearly", None, "20141231"),
 ]
 TRH_ROOTS = [
     # wx2026 met-sensors 2001–2014 (yearly) — fills gap before dedicated TRH instrument
     (MET_SENSORS_ROOT, "yearly", None, "20141231"),
-    # wx2026 met-sensors 2015 (monthly_mm)
-    (MET_SENSORS_ROOT, "monthly_mm", "20150101", "20151231"),
+    # wx2026 met-sensors 2015 (yearly — files directly in year dir)
+    (MET_SENSORS_ROOT, "yearly", "20150101", "20151231"),
     # wx2026 temperature-rh (2015–present, yearly; data starts 2015-04-15)
     (os.environ.get(
         "TRH_DATA_ROOT",
@@ -83,8 +83,8 @@ ANEM_ROOTS = [
     ), "yearly", "20140101"),
     # wx2026 met-sensors 2001–2014 (yearly) — fallback/pre-anemometer wind data
     (MET_SENSORS_ROOT, "yearly", None, "20141231"),
-    # wx2026 met-sensors 2015 (monthly_mm) — fallback wind data
-    (MET_SENSORS_ROOT, "monthly_mm", "20150101", "20151231"),
+    # wx2026 met-sensors 2015 (yearly — files directly in year dir) — fallback wind data
+    (MET_SENSORS_ROOT, "yearly", "20150101", "20151231"),
 ]
 
 # Keep simple aliases for _build_download_dataset compatibility
