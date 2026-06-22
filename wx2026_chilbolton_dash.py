@@ -27,69 +27,29 @@ import xarray as xr
 from dash import Input, Output, Patch, State, callback, dcc, html
 
 # ---------------------------------------------------------------------------
-# Data roots — override with environment variables
-# Each entry is (root_dir, layout) where layout is "yearly" or "monthly".
-# "yearly"  → root/<year>/*.nc
-# "monthly" → root/<year>/<yearmonth>/*.nc
-# When multiple roots exist, the file with the highest version number
-# (_vX.Y in the filename) is preferred; newest mtime breaks ties.
+# Data roots — wx2026 machine paths
 # ---------------------------------------------------------------------------
-# All wx2026 data live under this root on the SSDE GWS.
-WX2026_ROOT = "/data/wexp/cwalden/wx2026"
-
-# cfarr met-sensors (2001–2015, old cfarr format — pressure/temperature/rh/wind)
-# yearly layout for 2001–2014; monthly_mm layout for 2015.
-MET_SENSORS_ROOT = os.environ.get(
-    "MET_SENSORS_ROOT",
-    os.path.join(WX2026_ROOT, "met-sensors"),
-)
-
+MET_SENSORS_ROOT = "/data/wexp/cwalden/met-sensors"
+ 
 PRESSURE_ROOTS = [
-    # wx2026 pressure (2019–present, yearly — files directly in year dir)
-    (os.environ.get(
-        "PRESSURE_DATA_ROOT",
-        os.path.join(WX2026_ROOT, "pressure"),
-    ), "yearly", "20190101"),
-    # wx2026 met-sensors 2015 (yearly — files directly in year dir)
-    (MET_SENSORS_ROOT, "yearly", "20150101", "20151231"),
-    # wx2026 met-sensors 2001–2014 (yearly — files directly in year dir)
-    (MET_SENSORS_ROOT, "yearly", None, "20141231"),
+    ("/data/wexp/cwalden/pressure", "yearly"),
+    (MET_SENSORS_ROOT, "yearly"),
 ]
 TRH_ROOTS = [
-    # wx2026 met-sensors 2001–2014 (yearly) — fills gap before dedicated TRH instrument
-    (MET_SENSORS_ROOT, "yearly", None, "20141231"),
-    # wx2026 met-sensors 2015 (yearly — files directly in year dir)
-    (MET_SENSORS_ROOT, "yearly", "20150101", "20151231"),
-    # wx2026 temperature-rh (2015–present, yearly; data starts 2015-04-15)
-    (os.environ.get(
-        "TRH_DATA_ROOT",
-        os.path.join(WX2026_ROOT, "temperature-rh"),
-    ), "yearly", "20150101"),
+    ("/data/wexp/cwalden/temperature-rh", "yearly"),
+    (MET_SENSORS_ROOT, "yearly"),
 ]
 RAIN_ROOTS = [
-    # wx2026 precipitation (2005–present, yearly — files directly in year dir for all years)
-    # 2005–2014: cfarr-multiple-raingauges format (drop_count_b / tipping_bucket_a)
-    # 2015–present: ncas-rain-gauge-1 AMOF format (thickness_of_rainfall_amount)
-    (os.environ.get(
-        "RAIN_DATA_ROOT",
-        os.path.join(WX2026_ROOT, "precipitation"),
-    ), "yearly", "20050101"),
+    ("/data/wexp/cwalden/precipitation", "yearly"),
 ]
 ANEM_ROOTS = [
-    # wx2026 mean-winds (2014–present, yearly — files directly in year dir for all years)
-    (os.environ.get(
-        "ANEM_DATA_ROOT",
-        os.path.join(WX2026_ROOT, "mean-winds"),
-    ), "yearly", "20140101"),
-    # wx2026 met-sensors 2001–2014 (yearly) — fallback/pre-anemometer wind data
-    (MET_SENSORS_ROOT, "yearly", None, "20141231"),
-    # wx2026 met-sensors 2015 (yearly — files directly in year dir) — fallback wind data
-    (MET_SENSORS_ROOT, "yearly", "20150101", "20151231"),
+    ("/data/wexp/cwalden/mean-winds", "yearly"),
+    (MET_SENSORS_ROOT, "yearly"),
 ]
-
+ 
 # Keep simple aliases for _build_download_dataset compatibility
 DATA_ROOT = PRESSURE_ROOTS[0][0]
-TRH_DATA_ROOT = TRH_ROOTS[2][0]   # wx2026 temperature-rh (primary)
+TRH_DATA_ROOT = TRH_ROOTS[0][0]  # BADC (primary archive)
 RAIN_DATA_ROOT = RAIN_ROOTS[0][0]
 ANEM_DATA_ROOT = ANEM_ROOTS[0][0]
 
